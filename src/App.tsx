@@ -1,10 +1,11 @@
 import "./App.scss";
+import { PokemonList } from "./components/PokemonList";
 
 function App() {
   return (
-    <>
-      <h1>Can I pet that dawg?</h1>
-    </>
+    <main>
+      <PokemonList />
+    </main>
   );
 }
 
