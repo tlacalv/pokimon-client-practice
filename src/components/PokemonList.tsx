@@ -2,14 +2,18 @@ import React, { useEffect, useState } from "react";
 import type { PokemonResponse, Result } from "../types/pokemon";
 const LIMIT_RESULTS = 10;
 
-//to another place
-
 export const PokemonList = () => {
+  // TODO save previous responses in memory to prevent another request
+  // should I do it by spliting array and making calculations assuming list will always start from the first element?
+  // this approach might save up memory and be less complex but aslo not future proof and there might be some pitfalls I'm missing
+  // app will always start showing the first elements of the list, so we can go with the array approach for now
   const [list, setList] = useState<Result[]>([]);
   const [page, setPage] = useState(1);
   const offset = (page - 1) * LIMIT_RESULTS;
 
   useEffect(() => {
+    //TODO: move fetch into an utils file
+    //TODO:  might add an input to search pokemons and render that instead of the main list
     const fetchPokemons = async () => {
       try {
         const res = await fetch(
