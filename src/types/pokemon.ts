@@ -3,6 +3,7 @@ export interface PokemonResponse {
   next:     string;
   previous: string;
   results:  Result[];
+  error?: string;
 }
 
 export interface Result {

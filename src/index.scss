@@ -61,6 +61,9 @@ button:focus-visible {
 }
 
 // custom scss
+.title {
+  text-align: center;
+}
 .content {
   max-width: 1100px;
   margin: auto;
@@ -70,16 +73,23 @@ button:focus-visible {
   flex-direction: column;
   margin: auto;
   align-items: center;
+  width: 250px;
+  .controls {
+    margin-top: 1rem;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
 }
 .list {
   padding: 0;
   margin: 0;
-  max-width: 500px;
-  min-width: 250px;
+  width: 100%;
 
   border: 1px solid var(--main-950);
   box-shadow: 0 0 1rem .5rem rgba(0,0,0, .34);
   border-radius: 1rem;
+  overflow: hidden;
   .item-list {
     text-transform: capitalize;
     font-size: 1.2rem;
@@ -92,4 +102,20 @@ button:focus-visible {
       border: none;
     }
   }
+}
+.skeleton-button {
+  min-width: 100px;
+  min-height: 42px;
+  border-radius: 8px;
+  background-color: var(--main-950);
+}
+.skeleton-item-list {
+  list-style-type: none;
+  min-width: 250px;
+  min-height: 61.8px;
+  background-color: var(--main-950);
+  border-bottom: 1px solid var(--main-900);
+    &:last-child {
+      border: none;
+    }
 }

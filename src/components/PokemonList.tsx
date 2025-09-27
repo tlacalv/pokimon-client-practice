@@ -1,61 +1,73 @@
-import React, { useEffect, useState } from "react";
-import type { PokemonResponse, Result } from "../types/pokemon";
+import React, { useEffect, useRef, useState } from "react";
+import type { Result } from "../types/pokemon";
+import { PaginatedList } from "./PaginatedList";
+import { fetchPokemons } from "../utils";
+import { ListSkeleton } from "./ListSkeleton";
 const LIMIT_RESULTS = 10;
-
+type listPages = {
+  [key: number]: Result[];
+};
 export const PokemonList = () => {
-  // TODO save previous responses in memory to prevent another request
-  // should I do it by spliting array and making calculations assuming list will always start from the first element?
-  // this approach might save up memory and be less complex but aslo not future proof and there might be some pitfalls I'm missing
-  // app will always start showing the first elements of the list, so we can go with the array approach for now
-  const [list, setList] = useState<Result[]>([]);
+  //TODO: save elements in localstorage
+  //TODO: add modal for data of each pokimon and save that in localstorage as well
+  const [list, setList] = useState<listPages>({});
   const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const countRef = useRef<number>(null);
   const offset = (page - 1) * LIMIT_RESULTS;
+  const currentList = list[page] ?? [];
 
   useEffect(() => {
-    //TODO: move fetch into an utils file
-    //TODO:  might add an input to search pokemons and render that instead of the main list
-    const fetchPokemons = async () => {
+    const fetchCall = async () => {
+      setLoading(true);
       try {
-        const res = await fetch(
-          `https://pokeapi.co/api/v2/pokemon?limit=${LIMIT_RESULTS}&offset=${offset}`
-        );
-        const data: PokemonResponse = await res.json();
-
-        setList(data.results);
+        const data = await fetchPokemons(LIMIT_RESULTS, offset);
+        if (!countRef.current) {
+          countRef.current = data.count;
+        }
+        setList((prev) => {
+          return {
+            ...prev,
+            [page]: data.results,
+          };
+        });
+        setLoading(false);
       } catch (e) {
-        setList([]);
-        console.log(e);
+        setLoading(false);
+        setList({});
+        console.error(e);
       }
     };
-
-    fetchPokemons();
-  }, [offset]);
+    if (!list[page]) {
+      fetchCall();
+    }
+  }, [page]);
 
   const onNext = () => {
+    if (
+      countRef.current! &&
+      page >= Math.ceil(countRef.current! / LIMIT_RESULTS)
+    ) {
+      return;
+    }
+
     setPage((prev) => prev + 1);
   };
   const onPrev = () => {
+    if (page <= 1) {
+      return;
+    }
     setPage((prev) => prev - 1);
   };
   return (
     <div className="page-wrapper">
       <div className="content">
-        <h1>Pokimon</h1>
-
-        {/* componentize list */}
-        <div className="list-wrapper">
-          <ul className="list">
-            {list.map((item) => (
-              <li className="item-list">
-                <span>{item.name}</span>
-              </li>
-            ))}
-          </ul>
-          <div className="controls">
-            <button onClick={onPrev}>Prev page</button>
-            <button onClick={onNext}>Next page</button>
-          </div>
-        </div>
+        <h1 className="title">Pokimon</h1>
+        {loading || currentList.length === 0 ? (
+          <ListSkeleton />
+        ) : (
+          <PaginatedList list={currentList} onPrev={onPrev} onNext={onNext} />
+        )}
       </div>
     </div>
   );
