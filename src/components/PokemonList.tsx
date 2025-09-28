@@ -3,16 +3,19 @@ import type { Result } from "../types/pokemon";
 import { PaginatedList } from "./PaginatedList";
 import { fetchPokemons } from "../utils";
 import { ListSkeleton } from "./ListSkeleton";
+import { useLocalStorage } from "../hooks";
 const LIMIT_RESULTS = 10;
 type listPages = {
   [key: number]: Result[];
 };
 export const PokemonList = () => {
-  //TODO: save elements in localstorage
   //TODO: add modal for data of each pokimon and save that in localstorage as well
-  const [list, setList] = useState<listPages>({});
+  const { value: list, setValue: setList } = useLocalStorage<listPages>(
+    "pokimonList",
+    {}
+  );
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const countRef = useRef<number>(null);
   const offset = (page - 1) * LIMIT_RESULTS;
   const currentList = list[page] ?? [];
@@ -34,7 +37,6 @@ export const PokemonList = () => {
         setLoading(false);
       } catch (e) {
         setLoading(false);
-        setList({});
         console.error(e);
       }
     };
